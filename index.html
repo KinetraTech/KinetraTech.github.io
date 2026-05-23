@@ -1,52 +1,942 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Kinetra Tech</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kinetra Tech — Human Data for Robotics AI</title>
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap');
+
+    /* ── CSS Variables ── */
+    :root {
+      --ink:       #070c14;
+      --paper:     #f5f3ee;
+      --steel:     #0e1f38;
+      --sky:       #d4e9ff;
+      --pulse:     #3b82f6;
+      --pulse-dim: #1d4ed8;
+      --muted:     #64748b;
+      --border:    rgba(255,255,255,0.07);
+      --glow:      rgba(59,130,246,0.18);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
     body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #0f172a;
-      color: white;
-      text-align: center;
+      font-family: 'DM Sans', sans-serif;
+      background: var(--ink);
+      color: #e2e8f0;
+      overflow-x: hidden;
     }
-    .container {
-      padding: 80px 20px;
+
+    /* ── Noise overlay ── */
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      background-size: 180px;
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.5;
     }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 22px 48px;
+      background: rgba(7,12,20,0.75);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-logo {
+      display: flex; align-items: center; gap: 4px;
+      text-decoration: none;
+    }
+
+    .logo-mark {
+      width: 32px; height: 32px;
+      position: relative;
+    }
+
+    .logo-mark svg { width: 100%; height: 100%; }
+
+    .nav-wordmark {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #f0f6ff;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .nav-links {
+      display: flex; align-items: center; gap: 36px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: #94a3b8;
+      text-decoration: none;
+      font-size: 0.875rem;
+      font-weight: 500;
+      letter-spacing: 0.02em;
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover { color: #f0f6ff; }
+
+    .nav-cta {
+      padding: 9px 22px;
+      background: var(--pulse);
+      color: #fff !important;
+      border-radius: 6px;
+      font-weight: 600 !important;
+      transition: background 0.2s, transform 0.15s !important;
+    }
+
+    .nav-cta:hover {
+      background: var(--pulse-dim) !important;
+      transform: translateY(-1px);
+    }
+
+    /* ── HERO ── */
+    #hero {
+      min-height: 100vh;
+      display: flex; flex-direction: column;
+      justify-content: center; align-items: flex-start;
+      padding: 140px 48px 80px;
+      position: relative;
+    }
+
+    .hero-grid-lines {
+      position: absolute; inset: 0;
+      background-image:
+        linear-gradient(rgba(59,130,246,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(59,130,246,0.04) 1px, transparent 1px);
+      background-size: 60px 60px;
+      mask-image: radial-gradient(ellipse 70% 70% at 50% 40%, black, transparent);
+    }
+
+    .hero-glow {
+      position: absolute;
+      width: 700px; height: 700px;
+      top: -100px; right: -200px;
+      background: radial-gradient(circle, rgba(59,130,246,0.12) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .hero-tag {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 6px 14px;
+      border: 1px solid rgba(59,130,246,0.35);
+      border-radius: 100px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--pulse);
+      margin-bottom: 32px;
+      background: rgba(59,130,246,0.07);
+      animation: fadeUp 0.6s ease both;
+    }
+
+    .hero-tag-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--pulse);
+      animation: pulse-dot 2s infinite;
+    }
+
+    @keyframes pulse-dot {
+      0%,100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(0.7); }
+    }
+
     h1 {
-      font-size: 48px;
+      font-family: 'DM Serif Display', serif;
+      font-size: clamp(2.8rem, 6vw, 5.2rem);
+      line-height: 1.08;
+      color: #f0f6ff;
+      max-width: 780px;
+      margin-bottom: 28px;
+      animation: fadeUp 0.7s 0.1s ease both;
+    }
+
+    h1 em {
+      font-style: italic;
+      color: var(--pulse);
+    }
+
+    .hero-sub {
+      font-size: 1.125rem;
+      line-height: 1.7;
+      color: #94a3b8;
+      max-width: 520px;
+      margin-bottom: 48px;
+      font-weight: 300;
+      animation: fadeUp 0.7s 0.2s ease both;
+    }
+
+    .hero-actions {
+      display: flex; gap: 16px; flex-wrap: wrap;
+      animation: fadeUp 0.7s 0.3s ease both;
+    }
+
+    .btn-primary {
+      padding: 14px 32px;
+      background: var(--pulse);
+      color: #fff;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.9rem;
+      letter-spacing: 0.02em;
+      transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+      box-shadow: 0 0 30px rgba(59,130,246,0.3);
+    }
+
+    .btn-primary:hover {
+      background: var(--pulse-dim);
+      transform: translateY(-2px);
+      box-shadow: 0 0 40px rgba(59,130,246,0.45);
+    }
+
+    .btn-secondary {
+      padding: 14px 32px;
+      border: 1px solid rgba(255,255,255,0.15);
+      color: #e2e8f0;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 0.9rem;
+      transition: border-color 0.2s, background 0.2s;
+      background: rgba(255,255,255,0.03);
+    }
+
+    .btn-secondary:hover {
+      border-color: rgba(255,255,255,0.35);
+      background: rgba(255,255,255,0.06);
+    }
+
+    .hero-scroll-hint {
+      position: absolute;
+      bottom: 40px; left: 48px;
+      display: flex; align-items: center; gap: 10px;
+      font-size: 0.75rem;
+      color: #475569;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      animation: fadeUp 0.7s 0.5s ease both;
+    }
+
+    .scroll-line {
+      width: 40px; height: 1px;
+      background: linear-gradient(90deg, #3b82f6, transparent);
+    }
+
+    /* ── SECTION BASE ── */
+    section { position: relative; z-index: 1; }
+
+    .section-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 100px 48px;
+    }
+
+    .section-label {
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--pulse);
+      margin-bottom: 16px;
+      display: flex; align-items: center; gap: 10px;
+    }
+
+    .section-label::after {
+      content: '';
+      flex: 1;
+      max-width: 40px;
+      height: 1px;
+      background: var(--pulse);
+      opacity: 0.5;
+    }
+
+    h2 {
+      font-family: 'DM Serif Display', serif;
+      font-size: clamp(2rem, 4vw, 3rem);
+      color: #f0f6ff;
+      line-height: 1.12;
+      margin-bottom: 20px;
+    }
+
+    .section-desc {
+      font-size: 1.05rem;
+      color: #64748b;
+      max-width: 560px;
+      line-height: 1.75;
+      font-weight: 300;
+    }
+
+    /* ── DIVIDER ── */
+    .divider {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.07), transparent);
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    /* ── WHAT WE DO ── */
+    #what {
+      background: rgba(14,31,56,0.3);
+    }
+
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+      margin-top: 56px;
+    }
+
+    .card {
+      background: rgba(255,255,255,0.025);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 16px;
+      padding: 32px;
+      transition: border-color 0.2s, transform 0.2s, background 0.2s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(59,130,246,0.5), transparent);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .card:hover {
+      border-color: rgba(59,130,246,0.25);
+      transform: translateY(-4px);
+      background: rgba(59,130,246,0.04);
+    }
+
+    .card:hover::before { opacity: 1; }
+
+    .card-icon {
+      width: 44px; height: 44px;
+      border-radius: 10px;
+      background: rgba(59,130,246,0.12);
+      border: 1px solid rgba(59,130,246,0.2);
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 20px;
+    }
+
+    .card-icon svg { width: 22px; height: 22px; stroke: var(--pulse); }
+
+    .card h3 {
+      font-size: 1rem;
+      font-weight: 600;
+      color: #f0f6ff;
       margin-bottom: 10px;
+      letter-spacing: 0.01em;
     }
-    p {
-      font-size: 18px;
-      color: #cbd5f5;
+
+    .card p {
+      font-size: 0.9rem;
+      color: #64748b;
+      line-height: 1.7;
     }
-    .section {
-      margin-top: 60px;
+
+    /* ── HOW IT WORKS ── */
+    .steps {
+      margin-top: 64px;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .step {
+      display: grid;
+      grid-template-columns: 60px 1fr;
+      gap: 0 32px;
+      position: relative;
+    }
+
+    .step-left {
+      display: flex; flex-direction: column; align-items: center;
+    }
+
+    .step-num {
+      width: 44px; height: 44px;
+      border-radius: 50%;
+      background: rgba(59,130,246,0.1);
+      border: 1px solid rgba(59,130,246,0.35);
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'DM Serif Display', serif;
+      font-size: 1rem;
+      color: var(--pulse);
+      flex-shrink: 0;
+      position: relative;
+      z-index: 1;
+    }
+
+    .step-line {
+      flex: 1;
+      width: 1px;
+      background: linear-gradient(to bottom, rgba(59,130,246,0.25), transparent);
+      margin: 6px 0;
+    }
+
+    .step:last-child .step-line { display: none; }
+
+    .step-body {
+      padding: 4px 0 48px;
+    }
+
+    .step-body h3 {
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: #f0f6ff;
+      margin-bottom: 8px;
+    }
+
+    .step-body p {
+      font-size: 0.9rem;
+      color: #64748b;
+      line-height: 1.75;
+      max-width: 560px;
+    }
+
+    /* ── WHY ── */
+    #why { background: rgba(14,31,56,0.2); }
+
+    .why-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-top: 56px;
+    }
+
+    .why-item {
+      display: flex;
+      gap: 16px;
+      padding: 28px;
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 12px;
+      background: rgba(255,255,255,0.02);
+      transition: border-color 0.2s;
+    }
+
+    .why-item:hover { border-color: rgba(59,130,246,0.2); }
+
+    .why-check {
+      width: 24px; height: 24px;
+      border-radius: 50%;
+      background: rgba(59,130,246,0.15);
+      border: 1px solid rgba(59,130,246,0.3);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .why-check svg { width: 12px; height: 12px; stroke: var(--pulse); }
+
+    .why-item h4 {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: #e2e8f0;
+      margin-bottom: 6px;
+    }
+
+    .why-item p {
+      font-size: 0.875rem;
+      color: #64748b;
+      line-height: 1.7;
+    }
+
+    /* ── CONTACT ── */
+    #contact {
+      background: rgba(7,12,20,0.6);
+    }
+
+    .contact-box {
+      background: rgba(255,255,255,0.025);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 20px;
+      padding: 64px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      margin-top: 56px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .contact-box::before {
+      content: '';
+      position: absolute;
+      top: -80px; left: 50%; transform: translateX(-50%);
+      width: 400px; height: 400px;
+      background: radial-gradient(circle, rgba(59,130,246,0.08), transparent 70%);
+      pointer-events: none;
+    }
+
+    .contact-box h3 {
+      font-family: 'DM Serif Display', serif;
+      font-size: 2rem;
+      color: #f0f6ff;
+      margin-bottom: 14px;
+    }
+
+    .contact-box .sub {
+      color: #64748b;
+      font-size: 1rem;
+      margin-bottom: 36px;
+      max-width: 420px;
+      line-height: 1.7;
+    }
+
+    .contact-options {
+      display: flex; gap: 16px; flex-wrap: wrap; justify-content: center;
+      margin-bottom: 40px;
+    }
+
+    .contact-pill {
+      display: flex; align-items: center; gap: 8px;
+      padding: 10px 22px;
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 100px;
+      color: #94a3b8;
+      font-size: 0.875rem;
+      text-decoration: none;
+      transition: border-color 0.2s, color 0.2s, background 0.2s;
+      background: rgba(255,255,255,0.03);
+    }
+
+    .contact-pill:hover {
+      border-color: var(--pulse);
+      color: var(--pulse);
+      background: rgba(59,130,246,0.06);
+    }
+
+    .contact-pill svg { width: 15px; height: 15px; }
+
+    .roles {
+      display: flex; gap: 32px; flex-wrap: wrap; justify-content: center;
+    }
+
+    .role-card {
+      padding: 24px 32px;
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 12px;
+      background: rgba(255,255,255,0.02);
+      text-align: left;
+      min-width: 200px;
+      transition: border-color 0.2s;
+    }
+
+    .role-card:hover { border-color: rgba(59,130,246,0.2); }
+
+    .role-badge {
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--pulse);
+      margin-bottom: 8px;
+    }
+
+    .role-card h4 {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: #e2e8f0;
+      margin-bottom: 6px;
+    }
+
+    .role-card p {
+      font-size: 0.8rem;
+      color: #64748b;
+      line-height: 1.6;
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      border-top: 1px solid rgba(255,255,255,0.05);
+      padding: 32px 48px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      max-width: 100%;
+    }
+
+    .footer-logo {
+      font-family: 'DM Serif Display', serif;
+      color: #334155;
+      font-size: 0.95rem;
+    }
+
+    .footer-copy {
+      font-size: 0.8rem;
+      color: #334155;
+    }
+
+    /* ── ANIMATIONS ── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(28px);
+      transition: opacity 0.65s ease, transform 0.65s ease;
+    }
+
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 768px) {
+      nav { padding: 18px 24px; }
+      .nav-links { display: none; }
+      .section-inner { padding: 72px 24px; }
+      #hero { padding: 120px 24px 72px; }
+      .hero-scroll-hint { left: 24px; }
+      .why-grid { grid-template-columns: 1fr; }
+      .contact-box { padding: 40px 24px; }
+      footer { flex-direction: column; gap: 12px; text-align: center; }
     }
   </style>
 </head>
 <body>
 
-  <div class="container">
-    <h1>Kinetra Tech</h1>
-    <p>Powering robotics with human data</p>
-  </div>
+  <!-- ── NAVIGATION ── -->
+  <nav>
+    <a class="nav-logo" href="#">
+      <img src="data:image/png;base64,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AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAf/2Q==" alt="Kinetra Tech" style="height:72px;width:auto;flex-shrink:0;display:block;">
+      <span class="nav-wordmark">Kinetra<span style="color:var(--pulse);margin-left:5px;">Tech</span></span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="#what">What We Do</a></li>
+      <li><a href="#how">How It Works</a></li>
+      <li><a href="#why">Why Us</a></li>
+      <li><a href="#contact" class="nav-cta">Get Involved</a></li>
+    </ul>
+  </nav>
 
-  <div class="section">
-    <h2>What We Do</h2>
-    <p>We provide high-quality human-labeled data to train real-world robotics systems.</p>
-  </div>
+  <!-- ── HERO ── -->
+  <section id="hero">
+    <div class="hero-grid-lines"></div>
+    <div class="hero-glow"></div>
 
-  <div class="section">
-    <h2>How It Works</h2>
-    <p>Workers label and describe human actions, data is reviewed, and delivered for AI training.</p>
-  </div>
+    <div class="hero-tag">
+      <span class="hero-tag-dot"></span>
+      Robotics Training Data
+    </div>
 
-  <div class="section">
-    <h2>Contact</h2>
-    <p>aditya@kinetratech.com</p>
-  </div>
+    <h1>Human intelligence,<br><em>built for machines</em><br>that move.</h1>
+
+    <p class="hero-sub">
+      Kinetra Tech provides high-quality, human-labeled motion and action data so robotics AI systems can learn to understand the real world.
+    </p>
+
+    <div class="hero-actions">
+      <a href="#contact" class="btn-primary">Partner With Us</a>
+      <a href="#what" class="btn-secondary">See How It Works →</a>
+    </div>
+
+    <div class="hero-scroll-hint">
+      <span class="scroll-line"></span>
+      Scroll to explore
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ── WHAT WE DO ── -->
+  <section id="what">
+    <div class="section-inner">
+      <div class="reveal">
+        <div class="section-label">What We Do</div>
+        <h2>The data layer that<br>robots actually need.</h2>
+        <p class="section-desc">
+          Real-world robots don't learn from synthetic datasets. They need structured, high-fidelity human action data — and that's exactly what we produce.
+        </p>
+      </div>
+
+      <div class="cards-grid">
+        <div class="card reveal">
+          <div class="card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M15 10l-4 4-2-2-4 4"/><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/>
+            </svg>
+          </div>
+          <h3>Video Segmentation & Captioning</h3>
+          <p>We receive raw robot-captured video, break it into meaningful segments, and annotate each clip with precise natural-language descriptions of human actions.</p>
+        </div>
+
+        <div class="card reveal">
+          <div class="card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/>
+            </svg>
+          </div>
+          <h3>Motion & Action Labeling</h3>
+          <p>Trained contributors label body movement, interaction types, spatial context, and intent — giving AI models the structured signal they need to generalize.</p>
+        </div>
+
+        <div class="card reveal">
+          <div class="card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
+            </svg>
+          </div>
+          <h3>Structured Dataset Delivery</h3>
+          <p>Final datasets are quality-reviewed, formatted to spec, and delivered directly to robotics and AI teams ready to plug into their training pipelines.</p>
+        </div>
+
+        <div class="card reveal">
+          <div class="card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+            </svg>
+          </div>
+          <h3>Scalable Contributor Network</h3>
+          <p>We are actively building a skilled workforce of data contributors, enabling us to scale output quickly as client demand grows.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ── HOW IT WORKS ── -->
+  <section id="how">
+    <div class="section-inner">
+      <div class="reveal">
+        <div class="section-label">How It Works</div>
+        <h2>From raw footage<br>to training-ready data.</h2>
+        <p class="section-desc">A rigorous, multi-stage pipeline that turns unstructured robot-captured video into precise, actionable training datasets.</p>
+      </div>
+
+      <div class="steps">
+        <div class="step reveal">
+          <div class="step-left">
+            <div class="step-num">01</div>
+            <div class="step-line"></div>
+          </div>
+          <div class="step-body">
+            <h3>Receive Raw Video Data</h3>
+            <p>Robotics partners send us segmented video footage captured by robots in real-world environments — homes, workplaces, and public spaces where humans naturally move and interact.</p>
+          </div>
+        </div>
+
+        <div class="step reveal">
+          <div class="step-left">
+            <div class="step-num">02</div>
+            <div class="step-line"></div>
+          </div>
+          <div class="step-body">
+            <h3>Assign to Trained Contributors</h3>
+            <p>Clips are distributed to our network of contributors through a structured workflow. Each annotator follows detailed guidelines for consistent, high-quality labeling across every task.</p>
+          </div>
+        </div>
+
+        <div class="step reveal">
+          <div class="step-left">
+            <div class="step-num">03</div>
+            <div class="step-line"></div>
+          </div>
+          <div class="step-body">
+            <h3>Label, Caption & Annotate</h3>
+            <p>Contributors produce natural-language captions, action classifications, spatial context labels, and motion descriptors for each clip — capturing the full richness of human behavior.</p>
+          </div>
+        </div>
+
+        <div class="step reveal">
+          <div class="step-left">
+            <div class="step-num">04</div>
+            <div class="step-line"></div>
+          </div>
+          <div class="step-body">
+            <h3>Quality Review & Validation</h3>
+            <p>Every annotation passes through a review process to ensure accuracy, consistency, and compliance with client specifications before it progresses.</p>
+          </div>
+        </div>
+
+        <div class="step reveal">
+          <div class="step-left">
+            <div class="step-num">05</div>
+            <div class="step-line"></div>
+          </div>
+          <div class="step-body">
+            <h3>Deliver Structured Datasets</h3>
+            <p>Clean, structured data is packaged and delivered to AI teams — ready to feed directly into robotics training pipelines, improving model performance on real-world tasks.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ── WHY ── -->
+  <section id="why">
+    <div class="section-inner">
+      <div class="reveal">
+        <div class="section-label">Why Kinetra Tech</div>
+        <h2>Built for the demands<br>of real robotics AI.</h2>
+        <p class="section-desc">We're not a general annotation company. Our focus is exclusively on human motion and action data — the hardest and most valuable problem in robotics training.</p>
+      </div>
+
+      <div class="why-grid">
+        <div class="why-item reveal">
+          <div class="why-check">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20 6 9 17 4 12"/>
+            </svg>
+          </div>
+          <div>
+            <h4>Domain-Specific Expertise</h4>
+            <p>Our workflows are designed specifically for human action data in physical environments — not generic document or image labeling.</p>
+          </div>
+        </div>
+
+        <div class="why-item reveal">
+          <div class="why-check">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20 6 9 17 4 12"/>
+            </svg>
+          </div>
+          <div>
+            <h4>Quality-First Pipeline</h4>
+            <p>Multi-layer review ensures every annotation meets the precision standards that AI training requires. No shortcuts.</p>
+          </div>
+        </div>
+
+        <div class="why-item reveal">
+          <div class="why-check">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20 6 9 17 4 12"/>
+            </svg>
+          </div>
+          <div>
+            <h4>Scalable Contributor Network</h4>
+            <p>We are building infrastructure to scale contributor capacity rapidly, so we can meet growing demand without sacrificing quality.</p>
+          </div>
+        </div>
+
+        <div class="why-item reveal">
+          <div class="why-check">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20 6 9 17 4 12"/>
+            </svg>
+          </div>
+          <div>
+            <h4>Collaborative by Design</h4>
+            <p>We work closely with robotics partners to understand their data format, schema, and performance needs — not one-size-fits-all output.</p>
+          </div>
+        </div>
+
+        <div class="why-item reveal">
+          <div class="why-check">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20 6 9 17 4 12"/>
+            </svg>
+          </div>
+          <div>
+            <h4>Real-World Data, Not Synthetic</h4>
+            <p>Every clip we annotate comes from actual robot-captured footage in real environments — the ground truth that synthetic data simply cannot replicate.</p>
+          </div>
+        </div>
+
+        <div class="why-item reveal">
+          <div class="why-check">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20 6 9 17 4 12"/>
+            </svg>
+          </div>
+          <div>
+            <h4>Early-Stage Agility</h4>
+            <p>As an early-stage team, we move fast, communicate directly, and adapt our process to fit what early robotics clients actually need.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ── CONTACT ── -->
+  <section id="contact">
+    <div class="section-inner">
+      <div class="reveal">
+        <div class="section-label">Get Involved</div>
+        <h2>Let's build the future<br>of robotics data.</h2>
+      </div>
+
+      <div class="contact-box reveal">
+        <h3>Ready to work together?</h3>
+        <p class="sub">Whether you're a robotics company looking for training data, or someone who wants to contribute — we'd love to hear from you.</p>
+
+        <div class="contact-options">
+          <a href="mailto:admin@kinetratech.com" class="contact-pill">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+              <polyline points="22,6 12,13 2,6"/>
+            </svg>
+            admin@kinetratech.com
+          </a>
+        </div>
+
+        <div class="roles">
+          <div class="role-card reveal">
+            <div class="role-badge">For Companies</div>
+            <h4>Robotics & AI Partners</h4>
+            <p>Looking for structured human motion data? Let's discuss your training data needs and pipeline requirements.</p>
+          </div>
+          <div class="role-card reveal">
+            <div class="role-badge">For Contributors</div>
+            <h4>Data Labelers & Annotators</h4>
+            <p>Join our contributor network. Work remotely on meaningful AI projects and help shape the future of robotics.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── FOOTER ── -->
+  <footer>
+    <span class="footer-logo">Kinetra Tech</span>
+    <span class="footer-copy">© 2025 Kinetra Tech. All rights reserved.</span>
+  </footer>
+
+  <!-- ── SCROLL REVEAL ── -->
+  <script>
+    const reveals = document.querySelectorAll('.reveal');
+    const io = new IntersectionObserver(
+      (entries) => entries.forEach(e => {
+        if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); }
+      }),
+      { threshold: 0.12, rootMargin: '0px 0px -40px 0px' }
+    );
+    reveals.forEach((el, i) => {
+      el.style.transitionDelay = `${(i % 4) * 0.06}s`;
+      io.observe(el);
+    });
+  </script>
 
 </body>
 </html>
